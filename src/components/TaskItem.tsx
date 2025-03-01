@@ -1,4 +1,5 @@
-import { Loader2 } from 'lucide-react'
+import { useState } from 'react'
+import { Loader2, ChevronDown, ChevronUp } from 'lucide-react'
 
 interface TaskItemProps {
   task: string
@@ -22,7 +23,7 @@ function parseResponse(response: string): ParsedResponse {
   return { mainTask, subtasks };
 }
 
-export default function TaskItem({ 
+export default function TaskItem({
   task, 
   response, 
   onDelete, 
@@ -31,6 +32,7 @@ export default function TaskItem({
   onToggleCompletion,
   completed 
 }: TaskItemProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
   const parsedResponse = response ? parseResponse(response) : null;
 
   return (
@@ -68,7 +70,17 @@ export default function TaskItem({
       </div>
 
       {parsedResponse && (
-        <div className="mt-4 pl-7">
+        <div className="mt-2">
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-800 mb-2"
+          >
+            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            {isExpanded ? 'Sembunyikan Detail' : 'Tampilkan Detail'}
+          </button>
+          
+          {isExpanded && (
+            <div className="mt-2 pl-7">
           <div className="text-gray-600 font-medium mb-2">{parsedResponse.mainTask}</div>
           <ul className="space-y-2">
             {parsedResponse.subtasks.map((subtask, index) => (
@@ -82,6 +94,8 @@ export default function TaskItem({
               </li>
             ))}
           </ul>
+            </div>
+          )}
         </div>
       )}
     </div>

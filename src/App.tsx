@@ -11,19 +11,29 @@ interface Task {
 }
 
 export default function App() {
-  const [tasks, setTasks] = useState<Task[]>([])
+  const [tasks, setTasks] = useState<Task[]>(() => {
+    // Load tasks from localStorage on initial render
+    const savedTasks = localStorage.getItem('tasks')
+    return savedTasks ? JSON.parse(savedTasks) : []
+  })
   const [loading, setLoading] = useState(false)
 
   const addTask = (taskText: string) => {
-    setTasks([...tasks, { text: taskText, response: null, completed: false }])
+    const newTasks = [...tasks, { text: taskText, response: null, completed: false }]
+    setTasks(newTasks)
+    localStorage.setItem('tasks', JSON.stringify(newTasks))
   }
 
   const deleteTask = (index: number) => {
-    setTasks(tasks.filter((_, i) => i !== index))
+    const newTasks = tasks.filter((_, i) => i !== index)
+    setTasks(newTasks)
+    localStorage.setItem('tasks', JSON.stringify(newTasks))
   }
 
   const toggleCompletion = (index: number) => {
-    setTasks(tasks.map((task, i) => i === index ? { ...task, completed: !task.completed } : task))
+    const newTasks = tasks.map((task, i) => i === index ? { ...task, completed: !task.completed } : task)
+    setTasks(newTasks)
+    localStorage.setItem('tasks', JSON.stringify(newTasks))
   }
 
   const generateResponse = async (task: Task, index: number) => {
@@ -34,6 +44,7 @@ export default function App() {
       const updatedTasks = [...tasks]
       updatedTasks[index].response = response
       setTasks(updatedTasks)
+      localStorage.setItem('tasks', JSON.stringify(updatedTasks))
     } catch (error) {
       console.error('Error:', error)
       alert('Failed to generate response. Please try again.')
